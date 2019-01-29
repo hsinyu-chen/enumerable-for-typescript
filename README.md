@@ -1,6 +1,6 @@
 # Enumerable for Typescript
 
-linq methods for typescript
+Enumerable for typescript  base on es6 generator
 
 ## use
 
