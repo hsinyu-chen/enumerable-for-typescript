@@ -33,7 +33,7 @@ class Enumerable<T> {
         return this.source();
     }
 
-    join<TRight, TKey, TResult>(set: Enumerable<TRight>,
+    join<TRight, TKey, TResult>(set: EnumerableLike<TRight>,
         leftKeySelector: (e: T) => TKey,
         rightKeySelector: (e: TRight) => TKey,
         resultSelector: (left: T, right: TRight) => TResult,
@@ -41,8 +41,9 @@ class Enumerable<T> {
         const ref = this;
         return new Enumerable<TResult>(
             (function* () {
+                const e = Enumerable.from(set);
                 for (let item of ref.getEnumerator()) {
-                    for (let right of set.getEnumerator()) {
+                    for (let right of e.getEnumerator()) {
                         if (keyComparer(leftKeySelector(item), rightKeySelector(right))) {
                             yield resultSelector(item, right);
                         }
@@ -177,7 +178,7 @@ class Enumerable<T> {
             yield newItem;
         });
     }
-    concat(set: Enumerable<T> | Array<T> | NodeList) {
+    concat(set: EnumerableLike<T>) {
         const ref = this;
         return new Enumerable<T>(function* () {
             for (let item of ref.getEnumerator()) {
@@ -248,16 +249,17 @@ class Enumerable<T> {
             }
         });
     }
-    groupJoin<TKey, TResult, TRight>(set: Enumerable<TRight>,
+    groupJoin<TKey, TResult, TRight>(set: EnumerableLike<TRight>,
         letKeySelector: (e: T) => TKey,
         rightKeySelector: (e: TRight) => TKey,
         resultSelector: (grouping: Grouping<TKey, TRight>) => TResult,
         keyComparer: IEqualityComparer<TKey> = (a, b) => a === b) {
         const ref = this;
         return new Enumerable<TResult>(function* () {
+            const e = Enumerable.from(set);
             for (let item of ref.getEnumerator()) {
                 const leftKey = letKeySelector(item);
-                const sset = set.where(x => keyComparer(leftKey, rightKeySelector(x)));
+                const sset = e.where(x => keyComparer(leftKey, rightKeySelector(x)));
                 yield resultSelector(new Grouping(sset, leftKey));
             }
         });
