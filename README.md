@@ -24,8 +24,6 @@ function *gen(){
     yield 2;
     yield 3;
 }
-```
-```typescript
 new Enumerable(gen);
 ```
 or
