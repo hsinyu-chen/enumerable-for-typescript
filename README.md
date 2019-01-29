@@ -5,37 +5,41 @@ linq methods for typescript
 ## use
 
 ### Enumerable from array
-    ```typescript
+
+```typescript
     [1,2,3].asEnumerable();
-    ```
+```
 
 ### Enumerable from NodeList
-    ```typescript
+
+```typescript
     document.querySelectorAll('div').asEnumerable()
-    ```
+```
 
 ### Enumerable from generator
-    ```typescript
+
+```typescript
     function *gen(){
         for(let item of [1,2,3]){
             yield item;
         }
     }
-    ```
-    ```typescript
+```
+```typescript
     new Enumerable(gen);
-    ```
+```
 or
-    ```typescript
+```typescript
     new Enumerable(function*() {
         for(let item of [1,2,3]) {
             yield item;
         }
     });
-    ```
+```
 
 ## use Enumerable
-    ```typescript
+    
+```typescript
     Enumerable.range(0,5).select(x=>({id:x,name:`name-${x}`})).where(x=>x.id>3).toArray()
     // output
     // [{id: 4, name: "name-4"}]
@@ -64,7 +68,7 @@ or
     "3": []
     }
     */
-    ```
+```
 
 ## implemented function
 
