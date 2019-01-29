@@ -1,3 +1,4 @@
+type EnumerableLike<T> = Enumerable<T> | Array<T> | NodeList;
 class Enumerable<T> {
     static empty<T>() {
         return ([] as T[]).asEnumerable();
@@ -18,11 +19,19 @@ class Enumerable<T> {
             }
         });
     }
+    static from<T>(set: EnumerableLike<T>): Enumerable<T> {
+        if (set instanceof Array) {
+            return set.asEnumerable();
+        }
+        if (set instanceof NodeList) {
+            return set.asEnumerable();
+        }
+        return set;
+    }
     constructor(private source: () => IterableIterator<T>) { }
     getEnumerator() {
         return this.source();
     }
-
 
     join<TRight, TKey, TResult>(set: Enumerable<TRight>,
         leftKeySelector: (e: T) => TKey,
@@ -168,13 +177,13 @@ class Enumerable<T> {
             yield newItem;
         });
     }
-    concat(set: Enumerable<T>) {
+    concat(set: Enumerable<T> | Array<T> | NodeList) {
         const ref = this;
         return new Enumerable<T>(function* () {
             for (let item of ref.getEnumerator()) {
                 yield item;
             }
-            for (let item of set.getEnumerator()) {
+            for (let item of Enumerable.from(set).getEnumerator()) {
                 yield item;
             };
         });
@@ -212,11 +221,12 @@ class Enumerable<T> {
         }
         return undefined;
     }
-    except(set: Enumerable<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
+    except(set: EnumerableLike<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
         const ref = this;
         return new Enumerable<T>(function* () {
+            const e = Enumerable.from(set);
             for (let item of ref.getEnumerator()) {
-                if (!set.contains(item, comparer)) {
+                if (!e.contains(item, comparer)) {
                     yield item;
                 }
             }
@@ -252,11 +262,12 @@ class Enumerable<T> {
             }
         });
     }
-    intersect(set: Enumerable<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
+    intersect(set: EnumerableLike<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
         const ref = this;
         return new Enumerable<T>(function* () {
+            const e = Enumerable.from(set);
             for (let item of ref.getEnumerator()) {
-                if (set.contains(item, comparer)) {
+                if (e.contains(item, comparer)) {
                     yield item;
                 }
             }
@@ -301,9 +312,10 @@ class Enumerable<T> {
             }
         });
     }
-    sequenceEqual(set: Enumerable<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
+    sequenceEqual(set: EnumerableLike<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
+        const e = Enumerable.from(set);
         const leftIter = this.getEnumerator()[Symbol.iterator]();
-        const rightIter = set.getEnumerator()[Symbol.iterator]();
+        const rightIter = e.getEnumerator()[Symbol.iterator]();
         let left = leftIter.next();
         let right = rightIter.next();
         while (!left.done || !right.done) {
@@ -415,16 +427,17 @@ class Enumerable<T> {
     toArray(): T[] {
         return Array.from(this.source());
     }
-    union(set: Enumerable<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
+    union(set: EnumerableLike<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
         return this.concat(set).distinct(comparer);
     }
 
-    zip<TRight, TResult>(set: Enumerable<TRight>, resultSelector: (left: T, right: TRight) => TResult) {
+    zip<TRight, TResult>(set: EnumerableLike<TRight>, resultSelector: (left: T, right: TRight) => TResult) {
         const ref = this;
         return new Enumerable<TResult>(
             (function* () {
+                const e = Enumerable.from(set);
                 const leftIter = ref.getEnumerator()[Symbol.iterator]();
-                const rightIter = set.getEnumerator()[Symbol.iterator]();
+                const rightIter = e.getEnumerator()[Symbol.iterator]();
                 let left = leftIter.next();
                 let rihght = rightIter.next();
                 while (!left.done && !rihght.done) {
