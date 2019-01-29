@@ -235,7 +235,7 @@ class Enumerable<T> {
     }
     groupBy<TKey, TResult>(
         keySelector: (e: T) => TKey,
-        resultSelector: (grouping: Grouping<TKey, T>) => TResult,
+        resultSelector: (grouping: Grouping<TKey, T>) => TResult = x => x as any,
         keyComparer: IEqualityComparer<TKey> = (a, b) => a === b): Enumerable<TResult> {
         const ref = this;
         return new Enumerable<TResult>(function* () {
@@ -252,7 +252,7 @@ class Enumerable<T> {
     groupJoin<TKey, TResult, TRight>(set: EnumerableLike<TRight>,
         letKeySelector: (e: T) => TKey,
         rightKeySelector: (e: TRight) => TKey,
-        resultSelector: (grouping: Grouping<TKey, TRight>) => TResult,
+        resultSelector: (grouping: Grouping<TKey, TRight>) => TResult = x => x as any,
         keyComparer: IEqualityComparer<TKey> = (a, b) => a === b) {
         const ref = this;
         return new Enumerable<TResult>(function* () {
@@ -528,4 +528,4 @@ NodeList.prototype.asEnumerable = function () {
             yield ref.item(i) as any;
         }
     });
-};
+}; 
