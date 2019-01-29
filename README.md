@@ -31,15 +31,42 @@ or
 
 ## use Enumerable
 
-    Enumerable.range(0,5).select(x=>({id:x,name:`name-${x}`})).where(x=>x.id>3).toArray() // [{id: 4, name: "name-4"}]
+    Enumerable.range(0,5).select(x=>({id:x,name:`name-${x}`})).where(x=>x.id>3).toArray()
+    // output
+    // [{id: 4, name: "name-4"}]
+
+    var owners = [
+        { id: 1, name: 'a' },
+        { id: 2, name: 'b' },
+        { id: 3, name: 'c' }
+    ];
+    var pets = [
+        { owner: 1, name: 'pet-a' },
+        { owner: 1, name: 'pet-b' },
+        { owner: 2, name: 'pet-c' }
+    ];
+    owners.asEnumerable().groupJoin(pets, x => x.id, x => x.owner, x => x).toDictionary(x => x.key, x => x.toArray());
+    // output
+    /*
+    {
+    "1": [
+        { "owner": 1, "name": "pet-a" },
+        { "owner": 1, "name": "pet-b" }
+    ],
+    "2": [
+        { "owner": 2, "name": "pet-c" }
+    ],
+    "3": []
+    }
+    */
 
 ## implemented function
 
 ### staitc
 
-    static empty
-    static range
-    static repeat
+    empty
+    range
+    repeat
 
 ### instnace
 
