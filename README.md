@@ -7,57 +7,63 @@ linq methods for typescript
 ### Enumerable from array
 
 ```typescript
-    [1,2,3].asEnumerable();
+[1,2,3].asEnumerable();
 ```
 
 ### Enumerable from NodeList
 
 ```typescript
-    document.querySelectorAll('div').asEnumerable()
+document.querySelectorAll('div').asEnumerable()
 ```
 
 ### Enumerable from generator
 
 ```typescript
-    function *gen(){
-        for(let item of [1,2,3]){
-            yield item;
-        }
-    }
+function *gen(){
+    yield 1;
+    yield 2;
+    yield 3;
 ```
 ```typescript
-    new Enumerable(gen);
+new Enumerable(gen);
 ```
 or
 ```typescript
-    new Enumerable(function*() {
-        for(let item of [1,2,3]) {
-            yield item;
-        }
-    });
+new Enumerable(function*() {
+    for(let item of [1,2,3]) {
+        yield 1;
+        yield 2;
+        yield 3;
+    }
+});
 ```
 
 ## use Enumerable
     
 ```typescript
-    Enumerable.range(0,5).select(x=>({id:x,name:`name-${x}`})).where(x=>x.id>3).toArray()
-    // output
-    // [{id: 4, name: "name-4"}]
+Enumerable.range(0, 5)
+    .select(x => ({ id: x, name: `name-${x}` }))
+    .where(x => x.id > 3)
+    .toArray()
+// output
+// [{id: 4, name: "name-4"}]
 
-    var owners = [
-        { id: 1, name: 'a' },
-        { id: 2, name: 'b' },
-        { id: 3, name: 'c' }
-    ];
-    var pets = [
-        { owner: 1, name: 'pet-a' },
-        { owner: 1, name: 'pet-b' },
-        { owner: 2, name: 'pet-c' }
-    ];
-    owners.asEnumerable().groupJoin(pets, x => x.id, x => x.owner, x => x).toDictionary(x => x.key, x => x.toArray());
-    // output
-    /*
-    {
+var owners = [
+    { id: 1, name: 'a' },
+    { id: 2, name: 'b' },
+    { id: 3, name: 'c' }
+];
+var pets = [
+    { owner: 1, name: 'pet-a' },
+    { owner: 1, name: 'pet-b' },
+    { owner: 2, name: 'pet-c' }
+];
+owners.asEnumerable()
+    .groupJoin(pets, x => x.id, x => x.owner, x => x)
+    .toDictionary(x => x.key, x => x.toArray());
+// output
+/*
+{
     "1": [
         { "owner": 1, "name": "pet-a" },
         { "owner": 1, "name": "pet-b" }
@@ -66,8 +72,8 @@ or
         { "owner": 2, "name": "pet-c" }
     ],
     "3": []
-    }
-    */
+}
+*/
 ```
 
 ## implemented function
