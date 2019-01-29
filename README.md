@@ -58,7 +58,7 @@ var pets = [
     { owner: 2, name: 'pet-c' }
 ];
 owners.asEnumerable()
-    .groupJoin(pets, x => x.id, x => x.owner, x => x)
+    .groupJoin(pets, x => x.id, x => x.owner)
     .toDictionary(x => x.key, x => x.toArray());
 // output
 /*
