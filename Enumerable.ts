@@ -1,4 +1,4 @@
-type EnumerableLike<T> = Enumerable<T> | Array<T> | NodeList;
+type EnumerableLike<T> = Enumerable<T> | Array<T> | NodeList | { (): IterableIterator<T> };
 class Enumerable<T> {
     static empty<T>() {
         return ([] as T[]).asEnumerable();
@@ -25,6 +25,9 @@ class Enumerable<T> {
         }
         if (set instanceof NodeList) {
             return set.asEnumerable();
+        }
+        if (typeof set === 'function') {
+            return new Enumerable(set);
         }
         return set;
     }
@@ -528,4 +531,4 @@ NodeList.prototype.asEnumerable = function () {
             yield ref.item(i) as any;
         }
     });
-}; 
+};
