@@ -1,0 +1,19 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "outDir": "./dist",
+        "sourceMap": false,
+        "declaration": false,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "target": "esnext",
+        "lib": [
+            "esnext",
+            "dom"
+        ]
+    }
+}
