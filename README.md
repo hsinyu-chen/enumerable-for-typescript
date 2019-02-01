@@ -4,6 +4,21 @@ Enumerable for typescript  base on es6 generator
 
 ## use
 
+for typescript:
+
+    import 'src/Enumerable.patch';
+
+in your index script to patch Array and NodeList
+
+    import { Enumerable } from 'src/Enumerable';
+
+on script you want to use Enumerable
+
+for javascript:
+
+    <script src="dist/Enumerable.patch.js"></script>
+    <script src="dist/Enumerable.js"></script>
+
 ### Enumerable from array
 
 ```typescript

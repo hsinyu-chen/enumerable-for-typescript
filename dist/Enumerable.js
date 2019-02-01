@@ -1,4 +1,4 @@
-class Enumerable {
+export class Enumerable {
     constructor(source) {
         this.source = source;
     }
@@ -20,10 +20,7 @@ class Enumerable {
         });
     }
     static from(set) {
-        if (set instanceof Array) {
-            return set.asEnumerable();
-        }
-        if (set instanceof NodeList) {
+        if (set instanceof Array || set instanceof NodeList) {
             return set.asEnumerable();
         }
         if (typeof set === 'function') {
@@ -443,15 +440,3 @@ class OrderedEnumerable extends Enumerable {
         return new OrderedEnumerable(this.orderCommands.concat([{ direction: "desc", selector: selector }]), this);
     }
 }
-Array.prototype.asEnumerable = function () {
-    const ref = this;
-    return new Enumerable(() => ref.values());
-};
-NodeList.prototype.asEnumerable = function () {
-    const ref = this;
-    return new Enumerable(function* () {
-        for (let i = 0, c = ref.length; i < c; i++) {
-            yield ref.item(i);
-        }
-    });
-};

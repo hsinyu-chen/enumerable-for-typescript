@@ -1,5 +1,5 @@
 type EnumerableLike<T> = Enumerable<T> | Array<T> | NodeList | { (): IterableIterator<T> };
-class Enumerable<T> {
+export class Enumerable<T> {
     static empty<T>() {
         return ([] as T[]).asEnumerable();
     }
@@ -20,11 +20,8 @@ class Enumerable<T> {
         });
     }
     static from<T>(set: EnumerableLike<T>): Enumerable<T> {
-        if (set instanceof Array) {
-            return set.asEnumerable();
-        }
-        if (set instanceof NodeList) {
-            return set.asEnumerable();
+        if (set instanceof Array || set instanceof NodeList) {
+            return (set as unknown as any).asEnumerable();
         }
         if (typeof set === 'function') {
             return new Enumerable(set);
@@ -508,28 +505,3 @@ class OrderedEnumerable<T> extends Enumerable<T> {
         );
     }
 }
-interface IEqualityComparer<T> {
-    (a: T, b: T): boolean;
-}
-interface NodeList {
-    asEnumerable(): Enumerable<any>;
-}
-interface NodeListOf<TNode extends Node> {
-    asEnumerable(): Enumerable<TNode>;
-}
-interface Array<T> {
-    asEnumerable(): Enumerable<T>;
-}
-Array.prototype.asEnumerable = function () {
-    const ref = this as Array<any>;
-    return new Enumerable(() => ref.values());
-};
-NodeList.prototype.asEnumerable = function () {
-    const ref = this as NodeList;
-    return new Enumerable(function* () {
-        for (let i = 0, c = ref.length; i < c; i++) {
-            yield ref.item(i) as any;
-        }
-    });
-};
-document.querySelectorAll('').asEnumerable
