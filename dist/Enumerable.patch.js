@@ -1,4 +1,3 @@
-import { Enumerable } from "./Enumerable";
 Object.defineProperty(Array.prototype, 'asEnumerable', {
     value: function () {
         const ref = this;

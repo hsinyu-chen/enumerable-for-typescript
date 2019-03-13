@@ -1,4 +1,4 @@
-export class Enumerable {
+class Enumerable {
     constructor(source) {
         this.source = source;
     }
