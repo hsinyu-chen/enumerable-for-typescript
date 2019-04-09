@@ -2,6 +2,11 @@
 
 Enumerable for typescript  base on es6 generator
 
+## build
+
+```npm install```
+```npm run build```
+
 ## use
 
 for typescript:
@@ -16,8 +21,9 @@ on script you want to use Enumerable
 
 for javascript:
 
-    <script src="dist/Enumerable.patch.js"></script>
-    <script src="dist/Enumerable.js"></script>
+  you need require.js to load module
+
+  see sample/index.html for more detail
 
 ### Enumerable from array
 

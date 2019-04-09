@@ -2,7 +2,7 @@
     "compileOnSave": true,
     "compilerOptions": {
         "baseUrl": "./src",
-        "outDir": "./dist",
+        "outDir": "./dist.es5",
         "sourceMap": false,
         "declaration": false,
         "module": "amd",
@@ -10,9 +10,10 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "importHelpers": true,
-        "target": "esnext",
+        "downlevelIteration": true,
+        "target": "es5",
         "lib": [
-            "esnext",
+            "es6",
             "dom"
         ]
     }

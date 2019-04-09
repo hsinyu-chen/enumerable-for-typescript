@@ -11,7 +11,7 @@ type EnumerableLike<T> = IEnumerable<T> | Array<T> | NodeList | { (): IterableIt
 interface IEqualityComparer<T> {
     (a: T, b: T): boolean;
 }
-interface IEnumerable<T> {
+interface IEnumerable<T> extends Iterable<T>  {
     join<TRight, TKey, TResult>(set: EnumerableLike<TRight>,
         leftKeySelector: (e: T) => TKey,
         rightKeySelector: (e: TRight) => TKey,

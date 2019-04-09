@@ -1,5 +1,8 @@
 type EnumerableLike<T> = Enumerable<T> | Array<T> | NodeList | { (): IterableIterator<T> };
-export class Enumerable<T> {
+export class Enumerable<T>  {
+    [Symbol.iterator]() {
+        return this.getEnumerator();
+    }
     static empty<T>() {
         return ([] as T[]).asEnumerable();
     }
@@ -42,8 +45,8 @@ export class Enumerable<T> {
         return new Enumerable<TResult>(
             (function* () {
                 const e = Enumerable.from(set);
-                for (let item of ref.getEnumerator()) {
-                    for (let right of e.getEnumerator()) {
+                for (let item of ref) {
+                    for (let right of e) {
                         if (keyComparer(leftKeySelector(item), rightKeySelector(right))) {
                             yield resultSelector(item, right);
                         }
@@ -55,8 +58,8 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<TResult>(
             (function* () {
-                for (let item of ref.getEnumerator()) {
-                    for (let sItem of memberSelector(item).getEnumerator()) {
+                for (let item of ref) {
+                    for (let sItem of memberSelector(item)) {
                         yield sItem;
                     }
                 }
@@ -65,7 +68,7 @@ export class Enumerable<T> {
     }
     first(): T;
     first(predicate?: (e: T, i: number) => boolean): T | undefined {
-        const iter = (predicate ? this.where(predicate) : this).getEnumerator();
+        const iter = (predicate ? this.where(predicate) : this);
         for (let item of iter) {
             return item;
         }
@@ -74,7 +77,7 @@ export class Enumerable<T> {
 
     last(): T;
     last(predicate?: (e: T, i: number) => boolean): T | undefined {
-        const iter = (predicate ? this.where(predicate) : this).getEnumerator();
+        const iter = (predicate ? this.where(predicate) : this);
         let last: T | undefined = undefined;
         for (let e of iter) {
             last = e;
@@ -92,7 +95,7 @@ export class Enumerable<T> {
     ): TResult {
         let result: T | TResult | undefined = seed;
         let idx = 0;
-        for (let item of this.getEnumerator()) {
+        for (let item of this) {
             const i = idx++;
             if (result === undefined) {
                 result = (item as unknown) as TResult;
@@ -107,7 +110,7 @@ export class Enumerable<T> {
         return new Enumerable<TResult>(
             (function* () {
                 let idx = 0;
-                for (let item of ref.getEnumerator()) {
+                for (let item of ref) {
                     yield selector(item, idx++);
                 }
             })
@@ -115,7 +118,7 @@ export class Enumerable<T> {
     }
     count() {
         let c = 0;
-        for (let item of this.getEnumerator()) {
+        for (let item of this) {
             c++;
         }
         return c;
@@ -142,7 +145,7 @@ export class Enumerable<T> {
         return new Enumerable<T>(
             (function* () {
                 let idx = 0;
-                for (let item of ref.getEnumerator()) {
+                for (let item of ref) {
                     if (predicate(item, idx++)) {
                         yield item;
                     }
@@ -154,7 +157,7 @@ export class Enumerable<T> {
         return this.any(x => comparer(x, e));
     }
     all(predicate: (e: T) => boolean) {
-        for (let item of this.getEnumerator()) {
+        for (let item of this) {
             if (!predicate(item)) {
                 return false;
             }
@@ -162,7 +165,7 @@ export class Enumerable<T> {
         return true;
     }
     any(predicate: (e: T) => boolean) {
-        for (let item of this.getEnumerator()) {
+        for (let item of this) {
             if (predicate(item)) {
                 return true;
             }
@@ -172,7 +175,7 @@ export class Enumerable<T> {
     append(newItem: T) {
         const ref = this;
         return new Enumerable<T>(function* () {
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 yield item;
             }
             yield newItem;
@@ -181,10 +184,10 @@ export class Enumerable<T> {
     concat(set: EnumerableLike<T>) {
         const ref = this;
         return new Enumerable<T>(function* () {
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 yield item;
             }
-            for (let item of Enumerable.from(set).getEnumerator()) {
+            for (let item of Enumerable.from(set)) {
                 yield item;
             };
         });
@@ -193,7 +196,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(function* () {
             let hasItem = false;
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 hasItem = true;
                 yield item;
             }
@@ -206,7 +209,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(function* () {
             const cache: T[] = [];
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 if (cache.findIndex(x => comparer(x, item)) === -1) {
                     cache.push(item);
                     yield item;
@@ -215,7 +218,7 @@ export class Enumerable<T> {
         });
     }
     elementAt(n: number): T | undefined {
-        for (let item of this.getEnumerator()) {
+        for (let item of this) {
             if (n-- === 0) {
                 return item;
             }
@@ -226,7 +229,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(function* () {
             const e = Enumerable.from(set);
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 if (!e.contains(item, comparer)) {
                     yield item;
                 }
@@ -240,7 +243,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<TResult>(function* () {
             const keyCache: TKey[] = [];
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 const key = keySelector(item);
                 if (keyCache.findIndex(x => keyComparer(x, key)) === -1) {
                     keyCache.push(key);
@@ -257,7 +260,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<TResult>(function* () {
             const e = Enumerable.from(set);
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 const leftKey = letKeySelector(item);
                 const sset = e.where(x => keyComparer(leftKey, rightKeySelector(x)));
                 yield resultSelector(new Grouping(sset, leftKey));
@@ -268,7 +271,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(function* () {
             const e = Enumerable.from(set);
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 if (e.contains(item, comparer)) {
                     yield item;
                 }
@@ -284,7 +287,7 @@ export class Enumerable<T> {
     average(selector: (e: T) => number) {
         let sum = 0;
         let count = 0;
-        for (let item of this.getEnumerator()) {
+        for (let item of this) {
             count++;
             sum += selector(item);
         }
@@ -297,7 +300,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(function* () {
             yield newItem;
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 yield item;
             }
         });
@@ -306,7 +309,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(function* () {
             const cache: T[] = [];
-            for (let item of ref.getEnumerator()) {
+            for (let item of ref) {
                 cache.push(item);
             }
             for (let i = cache.length - 1; i > 0; i--) {
@@ -316,8 +319,8 @@ export class Enumerable<T> {
     }
     sequenceEqual(set: EnumerableLike<T>, comparer: IEqualityComparer<T> = (a, b) => a === b) {
         const e = Enumerable.from(set);
-        const leftIter = this.getEnumerator()[Symbol.iterator]();
-        const rightIter = e.getEnumerator()[Symbol.iterator]();
+        const leftIter = this[Symbol.iterator]();
+        const rightIter = e[Symbol.iterator]();
         let left = leftIter.next();
         let right = rightIter.next();
         while (!left.done || !right.done) {
@@ -336,8 +339,9 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(
             (function* () {
-                for (let item of ref.getEnumerator()) {
-                    if (n-- > 0) {
+                let c = n;
+                for (let item of ref) {
+                    if (c-- > 0) {
                         continue;
                     }
                     yield item;
@@ -362,7 +366,7 @@ export class Enumerable<T> {
             (function* () {
                 let skipping = true;
                 let idx = 0;
-                for (let item of ref.getEnumerator()) {
+                for (let item of ref) {
                     const i = idx++;
                     if (skipping) {
                         if (!predicate(item, i)) {
@@ -380,8 +384,9 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(
             (function* () {
-                for (let item of ref.getEnumerator()) {
-                    if (n-- > 0) {
+                let c = n;
+                for (let item of ref) {
+                    if (c-- > 0) {
                         yield item;
                     } else {
                         break;
@@ -405,7 +410,7 @@ export class Enumerable<T> {
         const ref = this;
         return new Enumerable<T>(
             (function* () {
-                for (let item of ref.getEnumerator()) {
+                for (let item of ref) {
                     if (predicate(item)) {
                         yield item;
                     } else {
@@ -421,7 +426,7 @@ export class Enumerable<T> {
     toDictionary<TValue>(keySelector: (e: T) => string, valueSelector?: (e: T) => TValue): { [key: string]: TValue }
     toDictionary<TValue>(keySelector: (e: T) => string | number, valueSelector: (e: T) => TValue = e => e as unknown as TValue) {
         const result = {} as any;
-        for (let item of this.getEnumerator()) {
+        for (let item of this) {
             result[keySelector(item)] = valueSelector(item);
         }
         return result;
@@ -438,8 +443,8 @@ export class Enumerable<T> {
         return new Enumerable<TResult>(
             (function* () {
                 const e = Enumerable.from(set);
-                const leftIter = ref.getEnumerator()[Symbol.iterator]();
-                const rightIter = e.getEnumerator()[Symbol.iterator]();
+                const leftIter = ref[Symbol.iterator]();
+                const rightIter = e[Symbol.iterator]();
                 let left = leftIter.next();
                 let rihght = rightIter.next();
                 while (!left.done && !rihght.done) {

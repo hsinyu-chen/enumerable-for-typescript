@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>sample</title>
+    <script src="require.js"></script>
+</head>
+
+<body>
+    <p>open developer tool!!</p>
+    <script>
+        require(['../dist/Enumerable.js', '../dist/Enumerable.patch.js'], function (module) {
+            var Enumerable = module.Enumerable;
+            console.log(Enumerable.range(1, 10).toArray());
+            console.log([1, 2, 3].asEnumerable().where(x => x >= 2).toArray());
+        });
+    </script>
+</body>
+
+</html>

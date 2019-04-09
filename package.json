@@ -1,0 +1,22 @@
+{
+  "name": "enumerable-for-typescript",
+  "version": "1.0.0",
+  "description": "Enumerable for typescript  base on es6 generator",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc & tsc --build tsconfig.es5.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dynameis/enumerable-for-typescript.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dynameis/enumerable-for-typescript/issues"
+  },
+  "homepage": "https://github.com/dynameis/enumerable-for-typescript#readme",
+  "devDependencies": {
+    "tslib": "^1.9.3"
+  }
+}
