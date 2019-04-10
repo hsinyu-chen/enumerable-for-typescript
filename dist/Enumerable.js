@@ -90,13 +90,7 @@ define(["require", "exports"], function (require, exports) {
             return result;
         }
         select(selector) {
-            const ref = this;
-            return new Enumerable((function* () {
-                let idx = 0;
-                for (let item of ref) {
-                    yield selector(item, idx++);
-                }
-            }));
+            return new SelectEnumerable(this.source, selector);
         }
         count() {
             let c = 0;
@@ -116,15 +110,7 @@ define(["require", "exports"], function (require, exports) {
             return iter.aggregate((x, y) => x + y, 0);
         }
         where(predicate) {
-            const ref = this;
-            return new Enumerable((function* () {
-                let idx = 0;
-                for (let item of ref) {
-                    if (predicate(item, idx++)) {
-                        yield item;
-                    }
-                }
-            }));
+            return new WhereEnumerable(this.source, predicate);
         }
         contains(e, comparer = (a, b) => a === b) {
             return this.any(x => comparer(x, e));
@@ -409,6 +395,38 @@ define(["require", "exports"], function (require, exports) {
         }
     }
     exports.Enumerable = Enumerable;
+    class SelectEnumerable extends Enumerable {
+        constructor(source, selector) {
+            super(function* () {
+                let idx = 0;
+                for (let item of source()) {
+                    yield selector(item, idx++);
+                }
+            });
+            this.selector = selector;
+            this.oSource = source;
+        }
+        select(selector) {
+            return new SelectEnumerable(this.oSource, (e, i) => selector(this.selector(e, i), i));
+        }
+    }
+    class WhereEnumerable extends Enumerable {
+        constructor(source, predicate) {
+            super(function* () {
+                let idx = 0;
+                for (let item of source()) {
+                    if (predicate(item, idx++)) {
+                        yield item;
+                    }
+                }
+            });
+            this.predicate = predicate;
+            this.oSource = source;
+        }
+        where(predicate) {
+            return new WhereEnumerable(this.oSource, (e, i) => this.predicate(e, i) && predicate(e, i));
+        }
+    }
     class Grouping extends Enumerable {
         constructor(set, key) {
             super(() => set.getEnumerator());

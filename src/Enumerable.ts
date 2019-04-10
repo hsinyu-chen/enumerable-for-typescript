@@ -31,7 +31,7 @@ export class Enumerable<T>  {
         }
         return set;
     }
-    constructor(private source: () => IterableIterator<T>) { }
+    constructor(protected source: () => IterableIterator<T>) { }
     getEnumerator() {
         return this.source();
     }
@@ -40,7 +40,7 @@ export class Enumerable<T>  {
         leftKeySelector: (e: T) => TKey,
         rightKeySelector: (e: TRight) => TKey,
         resultSelector: (left: T, right: TRight) => TResult,
-        keyComparer: IEqualityComparer<TKey> = (a, b) => a === b) {
+        keyComparer: IEqualityComparer<TKey> = (a, b) => a === b): Enumerable<TResult> {
         const ref = this;
         return new Enumerable<TResult>(
             (function* () {
@@ -105,16 +105,8 @@ export class Enumerable<T>  {
         }
         return result as TResult;
     }
-    select<TResult>(selector: (e: T, i: number) => TResult) {
-        const ref = this;
-        return new Enumerable<TResult>(
-            (function* () {
-                let idx = 0;
-                for (let item of ref) {
-                    yield selector(item, idx++);
-                }
-            })
-        );
+    select<TResult>(selector: (e: T, i: number) => TResult): Enumerable<TResult> {
+        return new SelectEnumerable<T, TResult>(this.source, selector);
     }
     count() {
         let c = 0;
@@ -141,17 +133,7 @@ export class Enumerable<T>  {
         return iter.aggregate((x, y) => x + y, 0);
     }
     where(predicate: (e: T, i: number) => boolean) {
-        const ref = this;
-        return new Enumerable<T>(
-            (function* () {
-                let idx = 0;
-                for (let item of ref) {
-                    if (predicate(item, idx++)) {
-                        yield item;
-                    }
-                }
-            })
-        );
+        return new WhereEnumerable<T>(this.source, predicate);
     }
     contains(e: T, comparer: IEqualityComparer<T> = (a, b) => a === b) {
         return this.any(x => comparer(x, e));
@@ -455,6 +437,38 @@ export class Enumerable<T>  {
                     }
                 }
             }));
+    }
+}
+class SelectEnumerable<TElement, TResult> extends Enumerable<TResult>{
+    private oSource: () => IterableIterator<TElement>;
+    constructor(source: () => IterableIterator<TElement>, private selector: (e: TElement, i: number) => TResult) {
+        super(function* () {
+            let idx = 0;
+            for (let item of source()) {
+                yield selector(item, idx++);
+            }
+        });
+        this.oSource = source;
+    }
+    select<TThenResult>(selector: (e: TResult, i: number) => TThenResult) {
+        return new SelectEnumerable<TElement, TThenResult>(this.oSource, (e, i) => selector(this.selector(e, i), i));
+    }
+}
+class WhereEnumerable<TElement> extends Enumerable<TElement>{
+    private oSource: () => IterableIterator<TElement>;
+    constructor(source: () => IterableIterator<TElement>, private predicate: (e: TElement, i: number) => boolean) {
+        super(function* () {
+            let idx = 0;
+            for (let item of source()) {
+                if (predicate(item, idx++)) {
+                    yield item;
+                }
+            }
+        });
+        this.oSource = source;
+    }
+    where(predicate: (e: TElement, i: number) => boolean) {
+        return new WhereEnumerable<TElement>(this.oSource, (e, i) => this.predicate(e, i) && predicate(e, i));
     }
 }
 class Grouping<Tkey, TElement> extends Enumerable<TElement> {

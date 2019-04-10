@@ -15,7 +15,25 @@
         require(['../dist/Enumerable.js', '../dist/Enumerable.patch.js'], function (module) {
             var Enumerable = module.Enumerable;
             console.log(Enumerable.range(1, 10).toArray());
-            console.log([1, 2, 3].asEnumerable().where(x => x >= 2).toArray());
+            var enumerable = new Enumerable(function* () {
+                console.log('generator started');
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+                yield 5;
+            });
+            console.log('build query');
+            enumerable = enumerable.where(x => x >= 2);
+            enumerable = enumerable.where(x => x < 5);
+            enumerable = enumerable.select(x => `num-${x}`);
+            enumerable = enumerable.select(x => `${x}-ok`);
+            enumerable = enumerable.select(x => `${x}-xxx`);
+            console.log('emit query', enumerable);
+            console.log(enumerable.toArray());
+
+            console.log('emit query second time');
+            console.log(enumerable.toArray());
         });
     </script>
 </body>
