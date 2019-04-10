@@ -30,7 +30,7 @@ for javascript:
          require(['../dist/Enumerable.js', '../dist/Enumerable.patch.js'], function (module) {
             var Enumerable = module.Enumerable;
             //... your code here..
-         }
+         });
     </script>
   ```
 
